@@ -17,6 +17,7 @@ process QIIME2_CLASSIFY {
     task.ext.when == null || task.ext.when
 
     script:
+    def confidence_threshold = task.ext.confidence_threshold ?: '0.8'
     // Exit if running this module with -profile conda / -profile mamba
     if (workflow.profile.tokenize(',').intersect(['conda', 'mamba']).size() >= 1) {
         error "QIIME2 does not support Conda. Please use Docker / Singularity / Podman instead."
@@ -31,6 +32,7 @@ process QIIME2_CLASSIFY {
         --p-n-jobs ${task.cpus}  \\
         --i-reads ${repseq}  \\
         --o-classification taxonomy.qza  \\
+        --p-confidence ${confidence_threshold} \\
         --verbose
     qiime metadata tabulate  \\
         --m-input-file taxonomy.qza  \\
